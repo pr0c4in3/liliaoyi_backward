@@ -55,17 +55,16 @@ class LoginManager:
         # session_key = str(uuid.uuid4())  # 模拟的session_key
 
         # 假设我们已经有了用户信息，这里直接返回
-        user_info = {
-            'nickName': '测试用户',
-            'avatarUrl': 'https://example.com/avatar.jpg'
-        }
+        # user_info = {
+        #     'nickName': '测试用户',
+        #     'avatarUrl': 'https://example.com/avatar.jpg'
+        # }
 
         # 存储登录状态
-        self.logged_users[openid] = user_info
+        # self.logged_users[openid] = user_info
 
         return jsonify({
             'success': True,
-            'userInfo': user_info
         })
 
     def register(self, app):
