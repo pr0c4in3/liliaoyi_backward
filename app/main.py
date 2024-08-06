@@ -4,12 +4,21 @@ import os
 from flask import Flask, request, jsonify, session
 from login import LoginManager  # 导入登录类
 from db_ctrl.users import Users
+from db_ctrl.photos import Photos
+from db_ctrl.info import Info
+from db_ctrl.use_time import UseTime
 
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 users=Users()
+photos=Photos()
+info=Info()
+usetime=UseTime()
+# 初始化用户数据库
+
+
 # 将LoginManager实例化并注册到app
 login_manager = LoginManager()
 login_manager.register(app)
