@@ -65,9 +65,16 @@ class Photos:
         '''根据昵称查询所有照片信息'''
         self.cursor.execute('SELECT * FROM photos WHERE nickname = ?', (nickname,))
         return self.cursor.fetchall()
-
+    def show_all(self):
+        '''根据昵称查询所有照片信息'''
+        self.cursor.execute('SELECT * FROM photos ')
+        return self.cursor.fetchall()
     def __del__(self):
         self.conn.close()
+
+photos_manager = Photos()
+# photos_manager.delete_photo('微信用户', 2)
+print(photos_manager.show_all())
 
 # # 示例用法
 # if __name__ == '__main__':

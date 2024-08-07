@@ -7,10 +7,24 @@ from db_ctrl.users import Users
 from db_ctrl.photos import Photos
 from db_ctrl.info import Info
 from db_ctrl.use_time import UseTime
+from werkzeug.utils import secure_filename
+from datetime import datetime
+
+
+# 保存照片并返回编号
+def save_photo(file, nickname, photo_type):
+    filename = secure_filename(f"{nickname}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file.filename.split('.')[-1]}")
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+    return filename
+
+
+
 
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+app.config['UPLOAD_FOLDER'] = 'photos'
+
 
 users=Users()
 photos=Photos()
@@ -27,9 +41,31 @@ login_manager.register(app)
 
 
 
+
+
 @app.route('/')
 def hello_world():
-    return '欢迎使用微信云托管！'
+    return '你好'
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    print(request.files)
+    if 'photo' not in request.files:
+        print('无文件')
+        return jsonify({'error': '没有文件部分'})
+    file = request.files['photo']
+    if file.filename == '':
+        print('没有选择文件')
+        return jsonify({'error': '没有选择文件'})
+    if file:
+        nickname = request.form.get('nickname')
+        print(nickname)
+        #photo_type = request.form.get('photo_type')
+        photo_path = save_photo(file, nickname, 0)
+        print(photo_path)
+        photos.add_photo(nickname, 0, photo_path)
+        return jsonify({'message': '文件上传成功', 'success': True, 'photo_path': photo_path})
+
 
 
 @app.route('/getUserInfo', methods=['POST']) # 获取用户信息
