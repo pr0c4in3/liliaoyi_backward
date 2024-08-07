@@ -58,8 +58,15 @@ class Info:
             params.append(doctor_notes)
         if updates:
             update_query = 'UPDATE info SET ' + ', '.join(updates) + ' WHERE nickname = ?'
-            self.cursor.execute(update_query, params)
-            self.conn.commit()
+            try:
+                self.cursor.execute(update_query, params)
+                self.conn.commit()
+                print("修改完成")
+            except Exception as e:
+            # 这里可以添加更详细的错误处理逻辑
+                print(f"An error occurred: {e}")
+            # 回滚事务
+                self.conn.rollback()
 
     def query_info_by_nickname(self, nickname):
         '''根据昵称查询用户信息'''
@@ -74,8 +81,8 @@ class Info:
         return self.cursor.fetchall()
 
 
-# info_manager = Info()
-# print(info_manager.show_all())
+info_manager = Info()
+print(info_manager.show_all())
 
 # # 示例用法
 # if __name__ == '__main__':

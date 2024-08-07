@@ -47,10 +47,13 @@ def getUserInfo():
 def submitInfo():
     data =request.get_json()
     if(info.query_info_by_nickname(data['nickname'])==None):
+        print('提交信息')
         info.add_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
     else:
-        info.update_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
-    print(data)
+        print('修改信息')
+        info.delete_info(nickname=data['nickname'])
+        info.add_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
+    #print(data)
     return jsonify({
             'success': True,
         })
