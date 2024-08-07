@@ -24,9 +24,29 @@ login_manager = LoginManager()
 login_manager.register(app)
 
 
+
+
+
 @app.route('/')
 def hello_world():
     return '欢迎使用微信云托管！'
+
+
+
+
+@app.route('/timer', methods=['POST'])
+def receive_use_time():
+    data =request.get_json()
+    nickname=data['userName']
+    duration=data['duration']
+    startTime=data['startTime']
+    usetime.add_use_time(nickname,int(duration),startTime)
+    # print('search:',usetime.query_use_time_by_nickname('微信用户'))
+    return jsonify({
+            'success': True,
+        })
+
+
 
 @app.route('/user', methods=['POST'])
 def receive_user_info():
