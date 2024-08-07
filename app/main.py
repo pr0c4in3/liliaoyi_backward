@@ -31,6 +31,30 @@ login_manager.register(app)
 def hello_world():
     return '欢迎使用微信云托管！'
 
+
+@app.route('/getUserInfo', methods=['POST']) # 获取用户信息
+def getUserInfo():
+    data =request.get_json()
+    nickname=data['nickname']
+    answer= info.query_info_by_nickname(nickname)
+    res={"name":answer[2],"gender":answer[3],"birthday":answer[4],"phone":answer[5],"doctor_notes":answer[6]}
+    # 返回JSON格式的响应
+    return jsonify(res)
+
+
+
+@app.route('/submitInfo', methods=['POST']) # 提交用户信息
+def submitInfo():
+    data =request.get_json()
+    if(info.query_info_by_nickname(data['nickname'])==None):
+        info.add_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
+    else:
+        info.update_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
+    print(data)
+    return jsonify({
+            'success': True,
+        })
+
 @app.route('/getUseTime', methods=['POST'])
 def getusetime():
     data =request.get_json()

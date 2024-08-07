@@ -69,6 +69,14 @@ class Info:
     def __del__(self):
         self.conn.close()
 
+    def show_all(self):
+        self.cursor.execute('SELECT * FROM info ',)
+        return self.cursor.fetchall()
+
+
+# info_manager = Info()
+# print(info_manager.show_all())
+
 # # 示例用法
 # if __name__ == '__main__':
 #     info_manager = Info()
