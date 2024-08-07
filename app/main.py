@@ -31,8 +31,19 @@ login_manager.register(app)
 def hello_world():
     return '欢迎使用微信云托管！'
 
-
-
+@app.route('/getUseTime', methods=['POST'])
+def getusetime():
+    data =request.get_json()
+    nickname=data['nickname']
+    answer= usetime.query_use_time_by_nickname(nickname)
+    # print(answer)
+    formatted_records = [
+        {"startTime": start_time, "duration": use_duration}
+        for use_duration, start_time in answer
+    ]
+    print(formatted_records)
+    # 返回JSON格式的响应
+    return jsonify(formatted_records)
 
 @app.route('/timer', methods=['POST'])
 def receive_use_time():
