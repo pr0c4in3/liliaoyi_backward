@@ -1,7 +1,7 @@
 import os
 
 #from flask import Flask
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_from_directory, send_file
 from login import LoginManager  # 导入登录类
 from db_ctrl.users import Users
 from db_ctrl.photos import Photos
@@ -38,14 +38,37 @@ login_manager = LoginManager()
 login_manager.register(app)
 
 
-
-
+my_url= 'http://6401f344.r3.cpolar.cn/'
+photo_api='photo/'
+dot='.'
 
 
 
 @app.route('/')
 def hello_world():
     return '你好'
+
+
+@app.route('/photo/<string:photo_id>', methods=['GET'])
+def get_photo(photo_id):
+    print(photo_id)
+    now= os.path.join(os.getcwd(), 'photos')
+    res= os.path.join(now,photo_id)
+    # print(send_file(res, as_attachment=True))
+    return send_file(res, as_attachment=True)
+
+
+@app.route('/getPhoto', methods=['POST'])
+def getPhoto():
+    data =request.get_json()
+    nickname=data['nickname']
+    res_photos=photos.query_photos_by_nickname(nickname)
+    photos_path = [res_photo[3] for res_photo in res_photos]
+    for index, item in enumerate(photos_path):
+        photos_path[index] = my_url + photo_api + item 
+    return jsonify(photos=photos_path)
+    
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
