@@ -150,8 +150,7 @@ def submitInfo():
         info.add_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
     else:
         print('修改信息')
-        info.delete_info(nickname=data['nickname'])
-        info.add_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
+        info.update_info(nickname=data['nickname'],name=data['name'],gender=data['gender'],birthday=data['birthday'],phone=data['phone'],doctor_notes='暂无')
     #print(data)
     return jsonify({
             'success': True,
