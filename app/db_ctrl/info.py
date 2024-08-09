@@ -40,7 +40,7 @@ class Info:
     def update_info(self, nickname, name=None, gender=None, birthday=None, phone=None, doctor_notes=None):
         '''根据昵称更新用户信息'''
         updates = []
-        params = [nickname]
+        params = []
         if name:
             updates.append('name = ?')
             params.append(name)
@@ -57,8 +57,10 @@ class Info:
             updates.append('doctor_notes = ?')
             params.append(doctor_notes)
         if updates:
+            params.append(nickname)
             update_query = 'UPDATE info SET ' + ', '.join(updates) + ' WHERE nickname = ?'
             try:
+                print(update_query,params)
                 self.cursor.execute(update_query, params)
                 self.conn.commit()
                 print("修改完成")
@@ -79,10 +81,11 @@ class Info:
     def show_all(self):
         self.cursor.execute('SELECT * FROM info ',)
         return self.cursor.fetchall()
+    
 
-
-info_manager = Info()
-print(info_manager.show_all())
+# info_manager = Info()
+# info_manager.update_info(nickname='微信用户',doctor_notes='1')
+# print(info_manager.show_all())
 
 # # 示例用法
 # if __name__ == '__main__':

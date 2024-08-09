@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息展示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>用户信息</h1>
+    <table id="userInfoTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>昵称</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>生日</th>
+                <th>电话</th>
+                <th>医生备注</th>
+                <th>修改医生备注</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 用户信息将通过JavaScript动态插入 -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchUserInfo();
+        });
+
+        function fetchUserInfo() {
+            fetch('/getAll') // 替换为你的后端端口地址
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayUserInfo(data);
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
+
+        function displayUserInfo(users) {
+            const tableBody = document.getElementById('userInfoTable').getElementsByTagName('tbody')[0];
+            users.forEach(user => {
+                const row = tableBody.insertRow();
+                // 其他单元格保持不变
+                row.insertCell(0).textContent = user.id;
+                row.insertCell(1).textContent = user.nickname;
+                row.insertCell(2).textContent = user.name;
+                row.insertCell(3).textContent = user.gender;
+                row.insertCell(4).textContent = user.birthday;
+                row.insertCell(5).textContent = user.phone;
+                row.insertCell(6).textContent = user.doctor_notes;
+
+                // 添加修改框和提交按钮
+                const editCell = row.insertCell(7);
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.value = user.doctor_notes;
+                const submitButton = document.createElement('button');
+                submitButton.textContent = '提交';
+                submitButton.onclick = function() {
+                    changeNote(user.nickname, inputField.value);
+                };
+                editCell.appendChild(inputField);
+                editCell.appendChild(submitButton);
+            });
+        }
+        function changeNote(nickname, newNote) {
+            const data = { nickname: nickname, doctor_notes: newNote };
+            fetch('/changeNote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('修改成功：', result);
+                location.reload(true);
+            })
+            .catch(error => {
+                console.error('修改失败：', error);
+            });
+        }
+    </script>
+</body>
+</html>

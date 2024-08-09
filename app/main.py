@@ -1,7 +1,7 @@
 import os
 
 #from flask import Flask
-from flask import Flask, request, jsonify, session, send_from_directory, send_file
+from flask import Flask, request, jsonify, session, send_from_directory, send_file, render_template
 from login import LoginManager  # 导入登录类
 from db_ctrl.users import Users
 from db_ctrl.photos import Photos
@@ -43,6 +43,31 @@ photo_api='photo/'
 dot='.'
 
 
+@app.route('/changeNote', methods=['POST']) # 提交用户信息
+def changeNote():
+    data =request.get_json()
+    # print(data)
+    info.update_info(nickname=data['nickname'],doctor_notes=data['doctor_notes'])
+    return jsonify({
+            'success': True,
+        })
+
+
+@app.route('/getAll')  #后台管理显示所有用户
+def getAll():
+    res=info.show_all()
+    formatted_records = [
+        {"id": id, "nickname": nickname, "name": name, "gender": gender, "birthday": birthday, "phone": phone, "doctor_notes": doctor_notes}
+        for id, nickname, name, gender, birthday, phone, doctor_notes in res
+    ]
+    print(formatted_records)
+    # 返回JSON格式的响应
+    return jsonify(formatted_records)
+
+
+@app.route('/back')
+def back():
+    return render_template('back.html')
 
 @app.route('/')
 def hello_world():
