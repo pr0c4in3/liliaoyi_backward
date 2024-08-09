@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>图片管理页面</title>
+    <style>
+        #photos-container {
+            margin-top: 20px;
+        }
+        .photo-item {
+            margin-bottom: 10px;
+        }
+        .delete-button {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>图片搜索与管理</h1>
+    <input type="text" id="nickname-input" placeholder="输入用户昵称">
+    <button onclick="searchPhotos()">搜索图片</button>
+    <div id="photos-container"></div>
+
+    <script>
+        const photo_api = '/photo/'; // 图片API的基础路径
+        const delete_url = '/del_pic'; // 删除图片的API路径
+
+        function searchPhotos() {
+            const nickname = document.getElementById('nickname-input').value;
+            fetch(`/getPhoto`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nickname: nickname })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const photosContainer = document.getElementById('photos-container');
+                photosContainer.innerHTML = ''; // 清空现有图片
+                data.photos.forEach(photo => {
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'photo-item';
+                    photoItem.innerHTML = `
+                        <img src="${photo}" alt="User Photo" style="width: 100px; height: auto;">
+                        <button class="delete-button" onclick="deletePhoto('${photo.split('/').pop()}')">删除</button>
+                    `;
+                    photosContainer.appendChild(photoItem);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function deletePhoto(photoId) {
+            if (confirm('确定要删除这张图片吗?')) {
+                fetch(delete_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ photo_id: photoId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('图片删除成功');
+                        // 刷新页面或更新图片列表
+                    } else {
+                        alert('删除失败');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>

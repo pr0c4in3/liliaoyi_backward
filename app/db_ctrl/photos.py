@@ -40,6 +40,16 @@ class Photos:
         except sqlite3.Error as e:
             print(f"Error deleting photo: {e}")
 
+
+    def delete_photo_by_path(self, path):
+        '''根据路径删除照片'''
+        try:
+            self.cursor.execute('DELETE FROM photos WHERE photo_path = ? ', (path,))
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print(f"Error deleting photo: {e}")
+
+
     def update_photo(self, nickname, photo_id, photo_path=None, photo_type=None):
         '''根据昵称和照片ID更新照片信息'''
         updates = []
@@ -73,7 +83,7 @@ class Photos:
         self.conn.close()
 
 photos_manager = Photos()
-# photos_manager.delete_photo('微信用户', 2)
+# photos_manager.delete_photo_by_path('20240808004626.png')
 print(photos_manager.show_all())
 
 # # 示例用法

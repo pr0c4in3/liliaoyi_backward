@@ -43,6 +43,21 @@ photo_api='photo/'
 dot='.'
 
 
+@app.route('/del_pic', methods=['POST']) # 管理用户图片
+def del_pic():
+    data =request.get_json()
+    print('删除的是：',data)
+    photos.delete_photo_by_path(data['photo_id'])
+    return jsonify({
+            'success': True,
+        })
+
+
+@app.route('/manage_pic') # 管理用户图片
+def manage_pic():
+    return render_template('manage_pic.html')
+
+
 @app.route('/changeNote', methods=['POST']) # 提交用户信息
 def changeNote():
     data =request.get_json()
