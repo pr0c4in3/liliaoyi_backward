@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理介绍</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; }
+        .introduction-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+        .input-group { margin-bottom: 10px; }
+        .input-group input, .input-group button { padding: 8px; margin-right: 5px; }
+        .title { font-size: 20px; color: #333; }
+        .content { font-size: 16px; color: #555; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>管理介绍</h1>
+        <div class="error" id="error-message"></div>
+        <div class="input-group">
+            <input type="text" id="title" placeholder="输入标题">
+            <input type="text" id="content" placeholder="输入内容">
+            <button onclick="addIntroduction()">添加介绍</button>
+        </div>
+        <div id="introductions-list"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadIntroductions();
+        });
+
+        function loadIntroductions() {
+            fetchIntroductions().then(introductions => {
+                const list = document.getElementById('introductions-list');
+                list.innerHTML = '';
+                introductions.forEach(intro => {
+                    const item = document.createElement('div');
+                    item.className = 'introduction-item';
+                    item.innerHTML = `
+                        <span class="title" id="title">${intro.title}</span>
+                        <p class="content" id="content">${intro.content}</p>
+                        <button id="update-introduction" onclick="editIntroduction(${intro.id})">编辑</button>
+                        <button  onclick="deleteIntroduction(${intro.id})">删除</button>
+                    `;
+                    list.appendChild(item);
+                });
+            }).catch(error => {
+                displayError('加载错误.');
+            });
+        }
+
+        function fetchIntroductions() {
+            return fetch('introductions').then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            });
+        }
+
+        function addIntroduction() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            fetch('intro_add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, content })
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('title').value = '';
+                    document.getElementById('content').value = '';
+                    loadIntroductions();
+                } else {
+                    throw new Error('Failed to add introduction.');
+                }
+            }).catch(error => {
+                displayError(error.message || '添加错误.');
+            });
+        }
+
+        function deleteIntroduction(id) {
+            fetch(`intro_del?id=${id}`, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok) {
+                    loadIntroductions();
+                } else {
+                    throw new Error('Failed to delete introduction.');
+                }
+            }).catch(error => {
+                displayError(error.message || '删除错误.');
+            });
+        }
+
+        function editIntroduction(id) {
+    // 创建一个函数来处理更新操作
+            const updateHandler = () => {
+                const title = document.getElementById('title').value;
+                const content = document.getElementById('content').value;
+
+                if (!title || !content) {
+                    displayError('标题和内容都不能为空。');
+                    return;
+                }
+            
+                fetch(`intro_re?id=${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ id, title, content })
+                }).then(response => {
+                    if (response.ok) {
+                        document.getElementById('title').value = ''; // 清空输入框
+                        document.getElementById('content').value = '';
+                        loadIntroductions(); // 刷新介绍列表
+                        displayError('更新成功。'); // 显示成功消息
+                    } else {
+                        throw new Error('Failed to update introduction.');
+                    }
+                }).catch(error => {
+                    displayError(error.message || '更新失败。');
+                });
+            };
+        
+            // // 绑定更新操作到输入框的回车事件
+            // document.getElementById('title').addEventListener('keypress', function(e) {
+            //     if (e.key === 'Enter') {
+            //         e.preventDefault();
+            //         updateHandler();
+            //     }
+            // });
+        
+            // document.getElementById('content').addEventListener('keypress', function(e) {
+            //     if (e.key === 'Enter') {
+            //         e.preventDefault();
+            //         updateHandler();
+            //     }
+            // });
+        
+            // 可以添加一个按钮来明确触发更新操作
+            const updateButton = document.getElementById('update-introduction');
+            if (updateButton) {
+                updateButton.onclick = updateHandler;
+            }
+        }
+
+        // // 确保在页面加载时移除之前可能添加的事件监听器
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     loadIntroductions();
+        //     document.getElementById('title').removeEventListener('keypress', null);
+        //     document.getElementById('content').removeEventListener('keypress', null);
+        // });
+
+        function displayError(message) {
+            document.getElementById('error-message').textContent = message;
+        }
+    </script>
+</body>
+</html>

@@ -7,6 +7,7 @@ from db_ctrl.users import Users
 from db_ctrl.photos import Photos
 from db_ctrl.info import Info
 from db_ctrl.use_time import UseTime
+from db_ctrl.intro import Intro
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
@@ -31,6 +32,8 @@ photos=Photos()
 info=Info()
 usetime=UseTime()
 # 初始化用户数据库
+intro=Intro()
+# 初始化介绍数据库
 
 
 # 将LoginManager实例化并注册到app
@@ -41,6 +44,82 @@ login_manager.register(app)
 my_url= 'http://6401f344.r3.cpolar.cn/'
 photo_api='photo/'
 dot='.'
+
+
+
+@app.route('/intro_re', methods=['PUT'])    # 后台修改介绍
+def update_introduction():
+    data = request.get_json()
+    print(data)
+    intro_id = data.get('id')
+    title = data.get('title')
+    content = data.get('content')
+
+    # 检查id、title和content是否都提供了
+    if not all([intro_id, title, content]):
+        return 400
+    try:
+        # 尝试将字符串id转换为整数
+        intro_id = int(intro_id)
+    except ValueError:
+        # 如果转换失败，返回400错误
+        return 400
+
+    # 调用Intro类的update_introduction方法更新介绍
+    intro.update_introduction(intro_id, title, content)
+
+    return jsonify({'message': 'Introduction updated successfully'})
+
+
+@app.route('/intro_del', methods=['DELETE'])    # 后台删除介绍
+def delete_introduction():
+    intro_id = request.args.get('id')  # 从查询参数中获取id
+
+    if not intro_id:
+        return 404
+
+    try:
+        # 尝试将字符串id转换为整数
+        intro_id = int(intro_id)
+    except ValueError:
+        # 如果转换失败，返回400错误
+        return 400
+
+    # 调用Intro类的delete_introduction方法删除介绍
+    intro.delete_introduction(intro_id)
+
+    return jsonify({'message': 'Introduction deleted successfully'})
+
+
+@app.route('/intro_add', methods=['POST'])  # 后台增加介绍
+def add_introduction():
+    data = request.get_json()
+    title = data.get('title')
+    content = data.get('content')
+
+    # 检查title和content是否都提供了
+    if not title or not content:
+        return 404
+
+    # 调用Intro类的add_introduction方法添加介绍
+    intro.add_introduction(title, content)
+
+    return jsonify({'message': 'Introduction added successfully'}), 201
+
+
+
+@app.route('/intro_ma') # 管理介绍
+def intro_ma():
+    return render_template('intro_ma.html')
+
+
+
+@app.route('/introductions', methods=['GET'])  # 小程序访问介绍
+def get_introductions():
+    introductions = intro.get_all_introductions()
+    print(introductions)
+    return jsonify([dict(id=row[0], title=row[1], content=row[2]) for row in introductions])
+
 
 
 @app.route('/del_pic', methods=['POST']) # 管理用户图片
